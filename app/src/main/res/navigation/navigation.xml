@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/reelsFragment">
+
+    <fragment
+        android:id="@+id/reelsFragment"
+        android:name="com.example.familymemories.ui.fragments.reels.ReelsFragment"
+        android:label="Reels"
+        tools:layout="@layout/fragment_reels">
+        <action
+            android:id="@+id/action_reelsFragment2_to_uploadVideoFragment2"
+            app:destination="@id/uploadVideoFragment" />
+        <action
+            android:id="@+id/action_reelsFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/uploadVideoFragment"
+        android:name="com.example.familymemories.ui.fragments.upload.UploadVideoFragment"
+        android:label="Upload Videos"
+        tools:layout="@layout/fragment_upload_video" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.familymemories.ui.fragments.search.SearchFragment"
+        android:label="Search"
+        tools:layout="@layout/fragment_search" />
+</navigation>

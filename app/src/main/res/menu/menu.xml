@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/reelsFragment"
+        android:icon="@drawable/reels"
+        android:title="Reels" />
+    <item
+        android:id="@+id/uploadVideoFragment"
+        android:icon="@drawable/addvideo"
+        android:title="Add Videos" />
+
+
+
+
+</menu>

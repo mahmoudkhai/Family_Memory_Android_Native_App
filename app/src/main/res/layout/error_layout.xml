@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:layout_gravity="center"
+    >
+
+    <ImageView
+        android:id="@+id/noWifiImg"
+        android:layout_width="@dimen/_80sdp"
+        android:layout_height="@dimen/_80sdp"
+        android:src="@drawable/no_wifi"
+        android:layout_marginTop="@dimen/_160sdp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        />
+
+
+
+</LinearLayout>
