@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
             requestPostNotificationPermission()
         }else {
             Log.d("HODA", "< than Terrm ")
-
         }
 
 

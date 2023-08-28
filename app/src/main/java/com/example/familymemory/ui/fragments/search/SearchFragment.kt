@@ -38,6 +38,7 @@ class SearchFragment : Fragment() {
                 .setQuery(databaseRef, VideoItem::class.java)
                 .build()
 
+
         searchAdapter = SearchAdapter(options , requireContext())
         binding.searchRecyclerView.adapter = searchAdapter
     }

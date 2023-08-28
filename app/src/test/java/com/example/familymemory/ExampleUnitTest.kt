@@ -1,4 +1,4 @@
-package com.example.familymemories
+package com.example.familymemory
 
 import org.junit.Test
 

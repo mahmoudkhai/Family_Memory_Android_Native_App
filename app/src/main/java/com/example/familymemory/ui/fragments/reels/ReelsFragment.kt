@@ -19,13 +19,20 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.LoadControl
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 import com.example.familymemory.R
 import com.example.familymemory.data.VideoItem
 import com.example.familymemory.databinding.FragmentReelsBinding
 import com.example.familymemory.ui.fragments.AddVideo
 import com.example.familymemory.util.NetworkStatus.networkStateFlow
+import com.example.familymemory.util.SnapToCenterSmoothScroller
+import com.example.familymemory.util.SpeedyLinearLayoutManager
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -40,7 +47,7 @@ import java.io.IOException
 class ReelsFragment : Fragment(), AddVideo {
     private lateinit var binding: FragmentReelsBinding
     private lateinit var navController: NavController
-    private var adapter: ReelsViewPagerAdapter? = null
+    private var adapter: ReelsAdapter? = null
     private lateinit var firebaseDatabaseRef: DatabaseReference
     private lateinit var storageRef: FirebaseStorage
     val REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION = 1
@@ -65,33 +72,49 @@ class ReelsFragment : Fragment(), AddVideo {
         navController = findNavController()
         storageRef = FirebaseStorage.getInstance()
         firebaseDatabaseRef = Firebase.database.getReference("videos")
-        val loadControl = DefaultLoadControl.Builder()
-            .setTargetBufferBytes(
-                6 * 1024 * 1024
-            )
-            .setBufferDurationsMs(
-                1 * 1000,  // minimum buffer size
-                1 * 1000,          // maximum buffer size
-                1 * 1000,          // buffer for playback duration
-                1 * 1000           // buffer for playback after rebuffering
-            )
-            .build()
-        player = ExoPlayer.Builder(requireContext()).setLoadControl(loadControl)
-            .build()
+
+        player = ExoPlayer.Builder(requireContext()).setLoadControl(createLoadControl()).build()
+
+        binding.recyclerView.apply {
+            val layoutManager =
+                SpeedyLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            this.layoutManager = layoutManager
+            // to scroll smoothly to the nearest next item.
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        val snapHelper = recyclerView.onFlingListener as SnapHelper
+                        val snapView = snapHelper.findSnapView(layoutManager)
+                        val targetPosition = snapView?.let {
+                            layoutManager.getPosition(it)
+                        } ?: RecyclerView.NO_POSITION
+
+                        val smoothScroller = SnapToCenterSmoothScroller(recyclerView.context)
+                        smoothScroller.targetPosition = targetPosition
+                        layoutManager.startSmoothScroll(smoothScroller)
+                    }
+                }
+            })
+        }
+
         lifecycleScope.launch {
-            requireContext().networkStateFlow().collectLatest {
-                if (it) {
+            requireContext().networkStateFlow().collectLatest { isNetworkConnected ->
+                if (isNetworkConnected) {
                     showErrorLayout(false)
                     val options = FirebaseRecyclerOptions.Builder<VideoItem>()
                         .setQuery(firebaseDatabaseRef, VideoItem::class.java)
                         .build()
-                    adapter = ReelsViewPagerAdapter(
-                        options, this@ReelsFragment, player
-                    ,requireContext())
+                    // initializing the adapter.
+                    adapter = ReelsAdapter(
+                        options, this@ReelsFragment, player, requireContext()
+                    )
                     adapter?.startListening()
-                    binding.viewPager.apply {
+                    // attaching adapter to recycler view
+                    binding.recyclerView.apply {
                         adapter = this@ReelsFragment.adapter
                     }
+
                     Log.d(
                         "Mahmoud",
                         "OPTIONS =  ${options}"
@@ -103,12 +126,28 @@ class ReelsFragment : Fragment(), AddVideo {
         }
 
 
-//        val snapHelper = LinearSnapHelper()
-//        snapHelper.attachToRecyclerView(binding.videoRecyclerView)
+        val snapHelper = LinearSnapHelper()
+        snapHelper.attachToRecyclerView(binding.recyclerView)
 
         binding.searchTV.setOnClickListener {
             navController.navigate(R.id.searchFragment)
         }
+    }
+
+    @androidx.media3.common.util.UnstableApi
+    private fun createLoadControl(): DefaultLoadControl {
+        return DefaultLoadControl.Builder()
+            .setTargetBufferBytes(
+                6 * 1024 * 1024
+            )
+            .setBufferDurationsMs(
+                1 * 1000,  // minimum buffer size
+                1 * 1000,          // maximum buffer size
+                1 * 1000,          // buffer for playback duration
+                1 * 1000           // buffer for playback after rebuffering
+            )
+            .build()
+
     }
 
     override fun onDestroyView() {
@@ -119,6 +158,8 @@ class ReelsFragment : Fragment(), AddVideo {
             release()
         }
     }
+
+
     private fun requestWriteExternalStoragePermission() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -248,11 +289,11 @@ class ReelsFragment : Fragment(), AddVideo {
             Log.d(
                 "Mahmoud", "Showing Error }"
             )
-            binding.viewPager.visibility = View.GONE
+            binding.recyclerView.visibility = View.GONE
             binding.searchTV.visibility = View.GONE
             binding.includedErrorLayout.noWifiImg.visibility = View.VISIBLE
         } else {
-            binding.viewPager.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.VISIBLE
             binding.searchTV.visibility = View.VISIBLE
             binding.includedErrorLayout.noWifiImg.visibility = View.GONE
         }

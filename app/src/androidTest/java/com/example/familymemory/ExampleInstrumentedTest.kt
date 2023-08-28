@@ -1,4 +1,4 @@
-package com.example.familymemories
+package com.example.familymemory
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/reelsFragment"
-        android:name="com.example.familymemories.ui.fragments.reels.ReelsFragment"
+        android:name="com.example.familymemory.ui.fragments.reels.ReelsFragment"
         android:label="Reels"
         tools:layout="@layout/fragment_reels">
         <action
@@ -19,12 +19,12 @@
     </fragment>
     <fragment
         android:id="@+id/uploadVideoFragment"
-        android:name="com.example.familymemories.ui.fragments.upload.UploadVideoFragment"
+        android:name="com.example.familymemory.ui.fragments.upload.UploadVideoFragment"
         android:label="Upload Videos"
         tools:layout="@layout/fragment_upload_video" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.familymemories.ui.fragments.search.SearchFragment"
+        android:name="com.example.familymemory.ui.fragments.search.SearchFragment"
         android:label="Search"
         tools:layout="@layout/fragment_search" />
 </navigation>
